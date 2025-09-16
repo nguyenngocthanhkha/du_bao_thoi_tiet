@@ -7,18 +7,23 @@
     <title>Weather - Dự báo thời tiết</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="../asset/styles.css">
 </head>
 <body>
     <header class="app-header">
         <div class="container">
             <h1 class="app-title">Dự báo thời tiết</h1>
             <div class="controls">
-                <form id="search-form" class="search-form" autocomplete="off">
-                    <input id="city-input" type="text" placeholder="Nhập thành phố (VD: Hanoi, Ho Chi Minh)" aria-label="Tìm thành phố">
-                    <button type="submit" class="btn primary">Tìm</button>
-                </form>
+    <form method = "get" id="search-form" class="search-form" autocomplete="off" action="weather.php">
+    <input id="city-input" type="text" placeholder="Nhập thành phố (VD: Hanoi, Ho Chi Minh)">
+    <button type="submit" class="btn primary">Tìm</button>
+    <!-- Nơi hiển thị danh sách gợi ý -->
+    <ul id="suggestions" class="suggestions"></ul>
+</form>
+
+            <!-- Chỗ hiển thị kết quả -->
+            <div id="result"></div>
                 <div class="control-actions">
                     <button id="geo-btn" class="btn">Vị trí của tôi</button>
                     <div class="toggle">
