@@ -7,7 +7,9 @@
     <title>Weather - Dự báo thời tiết</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+    <!-- Font Awesome CDN -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
     <link rel="stylesheet" href="asset/styles.css">
 </head>
 <body>
@@ -16,7 +18,8 @@
             <h1 class="app-title">Dự báo thời tiết</h1>
             <div class="controls">
     <form method = "get" id="search-form" class="search-form" autocomplete="off" action="weather.php">
-    <input id="city-input" type="text" placeholder="Nhập thành phố (VD: Hanoi, Ho Chi Minh)">
+        
+    <input id="city-input" name="city" type="text" placeholder="Nhập thành phố (VD: Hanoi, Ho Chi Minh)">
     <button type="submit" class="btn primary">Tìm</button>
     <!-- Nơi hiển thị danh sách gợi ý -->
     <ul id="suggestions" class="suggestions"></ul>
@@ -44,7 +47,10 @@
             <div class="current-left">
                 <h2 id="location-name">—</h2>
                 <div class="current-temp">
-                    <img id="current-icon" src="./assets/img/placeholder.svg" alt="Icon" width="64" height="64">
+                    <!-- <img id="current-icon" src="./assets/img/placeholder.svg" alt="Icon" width="64" height="64"> -->
+             <button id="geo-btn" class="btn">
+                <i class="fa-solid fa-cloud fa-2x"></i>
+            </button>
                     <div>
                         <div id="temp" class="temp">—</div>
                         <div id="desc" class="desc">—</div>
@@ -59,6 +65,7 @@
             <div class="current-right">
                 <div class="meta">
                     <span id="date">—</span>
+                    <span id="clock">—</span>
                     <span id="sun">Mặt trời mọc/lặn: —</span>
                 </div>
                 <div id="alerts" class="alerts" hidden>
@@ -84,7 +91,7 @@
         </div>
     </footer>
 
-    <script src="./assets/js/app.js"></script>
+    <script src="./asset/app.js"></script>
 </body>
 </html>
 
