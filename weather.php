@@ -8,10 +8,6 @@ $city = isset($_GET['city']) ? $_GET['city'] : 'Ho Chi Minh';
 // API key của bạn
 $apiKey = "7e1a92020fb10446446cb82105d49457"; // thay bằng key thật
 
-// Endpoint OpenWeather
-$urlCurrent  = "https://api.openweathermap.org/data/2.5/weather?q={$city}&appid={$apiKey}&lang=vi&units=metric";
-$urlForecast = "https://api.openweathermap.org/data/2.5/forecast?q={$city}&appid={$apiKey}&lang=vi&units=metric";
-
 // Hàm gọi API
 function callAPI($url) {
     $ch = curl_init();
@@ -27,23 +23,38 @@ function callAPI($url) {
     return json_decode($output, true);
 }
 
-// Lấy dữ liệu
-$current  = callAPI($urlCurrent);
-$forecast = callAPI($urlForecast);
+/* ==========================
+   1️⃣ Lấy tọa độ từ Geo API
+   ========================== */
+$geoUrl = "http://api.openweathermap.org/geo/1.0/direct?q=" . urlencode($city) . ",vn&limit=1&appid={$apiKey}";
+$geo = callAPI($geoUrl);
 
-// Nếu lỗi API
-if (!$current || !$forecast || (isset($current['cod']) && $current['cod'] != 200)) {
-    echo json_encode([
-        "error" => "Không lấy được dữ liệu từ OpenWeather",
-        "current_raw" => $current,
-        "forecast_raw" => $forecast
-    ]);
+if (!$geo || count($geo) == 0) {
+    echo json_encode(["error" => "Không tìm thấy thành phố"]);
     exit;
 }
 
-/* ==============================
-   🧥 Gợi ý trang phục hôm nay
-   ============================== */
+$lat = $geo[0]['lat'];
+$lon = $geo[0]['lon'];
+$cityName = $geo[0]['name'];
+
+/* ==========================
+   2️⃣ Gọi API thời tiết bằng lat/lon
+   ========================== */
+$urlCurrent  = "https://api.openweathermap.org/data/2.5/weather?lat={$lat}&lon={$lon}&appid={$apiKey}&lang=vi&units=metric";
+$urlForecast = "https://api.openweathermap.org/data/2.5/forecast?lat={$lat}&lon={$lon}&appid={$apiKey}&lang=vi&units=metric";
+
+$current  = callAPI($urlCurrent);
+$forecast = callAPI($urlForecast);
+
+if (!$current || !$forecast) {
+    echo json_encode(["error" => "Không lấy được dữ liệu từ OpenWeather"]);
+    exit;
+}
+
+/* ==========================
+   3️⃣ Gợi ý trang phục
+   ========================== */
 $temp = $current['main']['temp'];
 $desc = strtolower($current['weather'][0]['description']);
 $suggestion = "Hôm nay thời tiết dễ chịu, mặc thoải mái nhé!";
@@ -56,14 +67,12 @@ if (strpos($desc, 'mưa') !== false) {
     $suggestion = "Trời nóng, nhớ mặc đồ thoáng mát 👕 và uống nhiều nước 💧";
 }
 
-/* ==============================
-   🔔 Nhắc nhở ngày mai
-   ============================== */
+/* ==========================
+   4️⃣ Nhắc nhở ngày mai
+   ========================== */
 $reminder = null;
-if (isset($forecast['list'][8])) { 
-    // lấy dự báo sau ~24h (API forecast có step 3h → 8 bước = 24h)
+if (isset($forecast['list'][8])) {
     $tomorrowDesc = strtolower($forecast['list'][8]['weather'][0]['description']);
-
     if (strpos($tomorrowDesc, 'mưa') !== false) {
         $reminder = "Ngày mai có mưa, nhớ mang ô nhé ☔";
     } elseif (strpos($tomorrowDesc, 'nắng') !== false) {
@@ -73,8 +82,11 @@ if (isset($forecast['list'][8])) {
     }
 }
 
-// Trả JSON về cho frontend
+/* ==========================
+   5️⃣ Trả dữ liệu về frontend
+   ========================== */
 echo json_encode([
+    "city"       => $cityName,
     "current"    => $current,
     "forecast"   => $forecast,
     "suggestion" => $suggestion,
