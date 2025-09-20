@@ -14,19 +14,22 @@ document.getElementById("search-form").addEventListener("submit", async (e) => {
       throw new Error("Dữ liệu không hợp lệ từ API");
     }
 
-    // --- Đồng hồ ---
+    /* ------------------------
+       🕑 Đồng hồ thời gian thực
+       ------------------------ */
     function updateClock() {
       const now = new Date();
       const timeStr = now.toLocaleTimeString("vi-VN");
       document.getElementById("clock").textContent = timeStr;
     }
     if (!window.clockInterval) {
-      // chỉ setInterval 1 lần
       window.clockInterval = setInterval(updateClock, 1000);
     }
     updateClock();
 
-    // --- Thời tiết hiện tại ---
+    /* ------------------------
+       🌤 Thời tiết hiện tại
+       ------------------------ */
     document.getElementById("location-name").textContent = data.current.name;
     document.getElementById("temp").textContent =
       Math.round(data.current.main.temp) + "°C";
@@ -40,11 +43,12 @@ document.getElementById("search-form").addEventListener("submit", async (e) => {
       data.current.dt * 1000
     ).toLocaleString("vi-VN");
 
-    // --- Dự báo 5 ngày (mỗi ngày lấy 1 mốc) ---
+    /* ------------------------
+       📅 Dự báo 5 ngày
+       ------------------------ */
     const forecastList = document.getElementById("forecast-list");
     forecastList.innerHTML = "";
 
-    // lấy theo ngày duy nhất (0h hoặc 12h chẳng hạn)
     const daily = {};
     data.forecast.list.forEach((item) => {
       const day = new Date(item.dt * 1000).toLocaleDateString("vi-VN");
@@ -59,16 +63,59 @@ document.getElementById("search-form").addEventListener("submit", async (e) => {
         const el = document.createElement("div");
         el.classList.add("forecast-item");
         el.innerHTML = `
-        <span>${new Date(item.dt * 1000).toLocaleDateString("vi-VN")}</span>
-        <span>${Math.round(item.main.temp)}°C</span>
-        <span>${item.weather[0].description}</span>
-      `;
+          <span>${new Date(item.dt * 1000).toLocaleDateString("vi-VN")}</span>
+          <span>${Math.round(item.main.temp)}°C</span>
+          <span>${item.weather[0].description}</span>
+        `;
         forecastList.appendChild(el);
       });
+
+    /* ------------------------
+       👕 Gợi ý trang phục
+       ------------------------ */
+    let suggestionBox = document.getElementById("suggestion");
+    if (!suggestionBox) {
+      suggestionBox = document.createElement("div");
+      suggestionBox.id = "suggestion";
+      suggestionBox.classList.add("card", "suggestion-box");
+      document.querySelector("main.container").appendChild(suggestionBox);
+    }
+    suggestionBox.textContent = "👕 Gợi ý: " + data.suggestion;
+
+    /* ------------------------
+       🔔 Nhắc nhở ngày mai
+       ------------------------ */
+    if (data.reminder) {
+      // Hiện luôn trong giao diện
+      let reminderBox = document.getElementById("reminder");
+      if (!reminderBox) {
+        reminderBox = document.createElement("div");
+        reminderBox.id = "reminder";
+        reminderBox.classList.add("card", "reminder-box");
+        document.querySelector("main.container").appendChild(reminderBox);
+      }
+      reminderBox.textContent = "🔔 " + data.reminder;
+
+      // Thông báo popup (nếu cho phép)
+      if (Notification.permission === "granted") {
+        new Notification("🌦 Nhắc nhở thời tiết", {
+          body: data.reminder,
+          icon: "https://cdn-icons-png.flaticon.com/512/1163/1163661.png",
+        });
+      } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then((perm) => {
+          if (perm === "granted") {
+            new Notification("🌦 Nhắc nhở thời tiết", {
+              body: data.reminder,
+              icon: "https://cdn-icons-png.flaticon.com/512/1163/1163661.png",
+            });
+          }
+        });
+      }
+    }
   } catch (err) {
     console.error("Lỗi:", err.message);
 
-    // hiển thị lỗi ra giao diện thay vì chỉ alert
     document.getElementById("location-name").textContent = "Lỗi tải dữ liệu";
     document.getElementById("temp").textContent = "";
     document.getElementById("desc").textContent = err.message;
@@ -76,5 +123,11 @@ document.getElementById("search-form").addEventListener("submit", async (e) => {
     document.getElementById("wind").textContent = "";
     document.getElementById("date").textContent = "";
     document.getElementById("forecast-list").innerHTML = "";
+
+    let suggestionBox = document.getElementById("suggestion");
+    if (suggestionBox) suggestionBox.textContent = "";
+
+    let reminderBox = document.getElementById("reminder");
+    if (reminderBox) reminderBox.textContent = "";
   }
 });

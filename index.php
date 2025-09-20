@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Font Awesome CDN -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="asset/styles.css">
 </head>
 <body>
@@ -17,18 +17,18 @@
         <div class="container">
             <h1 class="app-title">Dự báo thời tiết</h1>
             <div class="controls">
-    <form method = "get" id="search-form" class="search-form" autocomplete="off" action="weather.php">
-        
-    <input id="city-input" name="city" type="text" placeholder="Nhập thành phố (VD: Hanoi, Ho Chi Minh)">
-    <button type="submit" class="btn primary">Tìm</button>
-    <!-- Nơi hiển thị danh sách gợi ý -->
-    <ul id="suggestions" class="suggestions"></ul>
-</form>
+                <form method="get" id="search-form" class="search-form" autocomplete="off" action="weather.php">
+                    <input id="city-input" name="city" type="text" placeholder="Nhập thành phố (VD: Hanoi, Ho Chi Minh)">
+                    <button type="submit" class="btn primary">Tìm</button>
+                    <ul id="suggestions" class="suggestions"></ul>
+                </form>
 
-            <!-- Chỗ hiển thị kết quả -->
-            <div id="result"></div>
+                <!-- Chỗ hiển thị kết quả -->
+                <div id="result"></div>
+
                 <div class="control-actions">
                     <button id="geo-btn" class="btn">Vị trí của tôi</button>
+                    <button id="notify-btn" class="btn">Bật thông báo</button>
                     <div class="toggle">
                         <input type="checkbox" id="unit-toggle" />
                         <label for="unit-toggle" title="Chuyển °C / °F">
@@ -47,10 +47,7 @@
             <div class="current-left">
                 <h2 id="location-name">—</h2>
                 <div class="current-temp">
-                    <!-- <img id="current-icon" src="./assets/img/placeholder.svg" alt="Icon" width="64" height="64"> -->
-             <button id="geo-btn" class="btn">
-                <i class="fa-solid fa-cloud fa-2x"></i>
-            </button>
+                    <i id="weather-icon" class="fa-solid fa-cloud fa-2x"></i>
                     <div>
                         <div id="temp" class="temp">—</div>
                         <div id="desc" class="desc">—</div>
@@ -60,6 +57,16 @@
                     <span id="feels">Cảm giác: —</span>
                     <span id="humidity">Độ ẩm: —</span>
                     <span id="wind">Gió: —</span>
+                </div>
+
+                <!-- 🆕 Gợi ý trang phục -->
+                <div id="suggestion" class="suggestion-box">
+                    Gợi ý trang phục: —
+                </div>
+
+                <!-- 🆕 Nhắc nhở ngày mai -->
+                <div id="reminder" class="reminder-box">
+                    Nhắc nhở: —
                 </div>
             </div>
             <div class="current-right">
@@ -94,4 +101,3 @@
     <script src="./asset/app.js"></script>
 </body>
 </html>
-
