@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Lấy vị trí hiện tại kinh độ vĩ độ
   document.getElementById("geo-btn").addEventListener("click", () => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
