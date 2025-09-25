@@ -1,5 +1,4 @@
-<!-- //"9e74dda636db58c18120b15630a121f8; -->
- <?php
+<?php
 header('Content-Type: application/json; charset=utf-8');
 
 // Lấy city từ request

@@ -137,3 +137,8 @@ body {
 .suggestions li:hover {
   background: #f0f0f0;
 }
+.forecast-item img.forecast-icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}

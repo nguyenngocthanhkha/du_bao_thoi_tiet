@@ -7,23 +7,24 @@
     <title>Weather - Dự báo thời tiết</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
-    <link rel="stylesheet" href="../asset/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+    <!-- ✅ Đường dẫn CSS đúng -->
+    <link rel="stylesheet" href="asset/styles.css">
 </head>
 <body>
     <header class="app-header">
         <div class="container">
             <h1 class="app-title">Dự báo thời tiết</h1>
             <div class="controls">
-    <form method = "get" id="search-form" class="search-form" autocomplete="off" action="weather.php">
-    <input id="city-input" type="text" placeholder="Nhập thành phố (VD: Hanoi, Ho Chi Minh)">
-    <button type="submit" class="btn primary">Tìm</button>
-    <!-- Nơi hiển thị danh sách gợi ý -->
-    <ul id="suggestions" class="suggestions"></ul>
-</form>
+                <form method="get" id="search-form" class="search-form" autocomplete="off" action="weather.php">
+                    <input id="city-input" type="text" placeholder="Nhập thành phố (VD: Hanoi, Ho Chi Minh)">
+                    <button type="submit" class="btn primary">Tìm</button>
+                    <!-- Gợi ý -->
+                    <ul id="suggestions" class="suggestions"></ul>
+                </form>
 
-            <!-- Chỗ hiển thị kết quả -->
-            <div id="result"></div>
+                <!-- Kết quả -->
+                <div id="result"></div>
                 <div class="control-actions">
                     <button id="geo-btn" class="btn">Vị trí của tôi</button>
                     <div class="toggle">
@@ -44,7 +45,7 @@
             <div class="current-left">
                 <h2 id="location-name">—</h2>
                 <div class="current-temp">
-                    <img id="current-icon" src="./assets/img/placeholder.svg" alt="Icon" width="64" height="64">
+                    <img id="current-icon" src="" alt="Icon" width="64" height="64">
                     <div>
                         <div id="temp" class="temp">—</div>
                         <div id="desc" class="desc">—</div>
@@ -71,7 +72,7 @@
         <section id="forecast" class="card">
             <h3>3-5 ngày tới</h3>
             <div id="forecast-list" class="forecast-list">
-                <!-- Items will be rendered by JS -->
+                <!-- Items sẽ render bằng JS -->
             </div>
         </section>
     </main>
@@ -84,7 +85,7 @@
         </div>
     </footer>
 
-    <script src="./assets/js/app.js"></script>
+    <!-- ✅ Đường dẫn JS đúng -->
+    <script src="asset/app.js"></script>
 </body>
 </html>
-
