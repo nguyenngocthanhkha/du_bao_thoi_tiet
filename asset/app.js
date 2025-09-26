@@ -41,7 +41,7 @@ const cityMap = {
   "bình định": "Binh Dinh",
 };
 
-// Cập nhật giao diện
+// ====== Hàm updateUI ======
 function updateUI(data) {
   // Đồng hồ
   function updateClock() {
@@ -63,13 +63,16 @@ function updateUI(data) {
   document.getElementById("wind").textContent = "Gió: " + current.wind.speed + " m/s";
   document.getElementById("date").textContent = new Date(current.dt * 1000).toLocaleString("vi-VN");
 
-  // Icon hiện tại
-  const iconUrl = `https://openweathermap.org/img/wn/${weather.icon}@2x.png`;
+  // Icon hiện tại từ weather.php
   const iconEl = document.getElementById("weather-icon");
   if (iconEl) {
-    iconEl.src = iconUrl;
+    iconEl.src = data.icon;
     iconEl.alt = weather.description;
   }
+
+  //  Gợi ý trang phục & Nhắc nhở từ weather.php
+  document.getElementById("suggestion").textContent = data.suggestion || "—";
+  document.getElementById("reminder").textContent   = data.reminder || "—";
 
   // Forecast 5 ngày
   const forecastList = document.getElementById("forecast-list");

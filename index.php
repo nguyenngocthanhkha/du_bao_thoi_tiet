@@ -91,6 +91,41 @@
   </footer>
 
   <!-- Script -->
+  <script>
+    // --- Gợi ý trang phục dựa trên nhiệt độ ---
+    function getClothingSuggestion(tempC) {
+      if (tempC <= 10) return "Áo khoác dày, áo len, khăn quàng";
+      if (tempC <= 20) return "Áo khoác nhẹ, áo dài tay";
+      if (tempC <= 30) return "Áo thun, quần dài/short";
+      return "Quần áo nhẹ, mát, đội nón khi ra nắng";
+    }
+
+    // --- Nhắc nhở cho ngày mai dựa trên dự báo ---
+    function getTomorrowReminder(forecastList) {
+      const tomorrow = forecastList[1]; // giả sử mảng forecastList thứ 2 là ngày mai
+      if (!tomorrow) return "Không có nhắc nhở đặc biệt.";
+      let reminder = "";
+      if (tomorrow.temp_max >= 35) reminder += "Uống nhiều nước, tránh nắng. ";
+      if (tomorrow.weather.toLowerCase().includes("rain")) reminder += "Mang ô hoặc áo mưa. ";
+      if (tomorrow.temp_min <= 10) reminder += "Mang áo ấm. ";
+      return reminder || "Không có nhắc nhở đặc biệt.";
+    }
+
+    // --- Ví dụ cập nhật sau khi fetch API ---
+    // Giả lập dữ liệu từ API để demo
+    const currentTempC = 28; // nhiệt độ hiện tại (°C)
+    const forecastList = [
+      { temp_min: 27, temp_max: 30, weather: "clear" },
+      { temp_min: 26, temp_max: 33, weather: "rain" }, // ngày mai
+      { temp_min: 25, temp_max: 32, weather: "clouds" },
+    ];
+
+    document.getElementById("suggestion").textContent =
+      "Gợi ý trang phục: " + getClothingSuggestion(currentTempC);
+
+    document.getElementById("reminder").textContent =
+      "Nhắc nhở: " + getTomorrowReminder(forecastList);
+  </script>
   <script src="./asset/app.js"></script>
 </body>
 </html>
