@@ -33,12 +33,12 @@ function callAPI($url) {
     return $data;
 }
 
-// --- Xác định query (lat/lon hoặc city) ---
-if (!empty($_GET["lat"]) && !empty($_GET["lon"])) {
-    $lat = $_GET["lat"];
-    $lon = $_GET["lon"];
-    $urlCurrent  = "https://api.openweathermap.org/data/2.5/weather?lat={$lat}&lon={$lon}&appid={$apiKey}&lang=vi&units=metric";
-    $urlForecast = "https://api.openweathermap.org/data/2.5/forecast?lat={$lat}&lon={$lon}&appid={$apiKey}&lang=vi&units=metric";
+// --- Xác định query ---
+// Bấm "Vị trí của tôi" -> luôn là Quy Nhơn
+if (isset($_GET["geo"])) {
+    $city = "Quy Nhon";
+    $urlCurrent  = "https://api.openweathermap.org/data/2.5/weather?q={$city}&appid={$apiKey}&lang=vi&units=metric";
+    $urlForecast = "https://api.openweathermap.org/data/2.5/forecast?q={$city}&appid={$apiKey}&lang=vi&units=metric";
 } else {
     $city = isset($_GET["city"]) ? urlencode($_GET["city"]) : "Hanoi";
     $urlCurrent  = "https://api.openweathermap.org/data/2.5/weather?q={$city}&appid={$apiKey}&lang=vi&units=metric";
@@ -101,11 +101,24 @@ if (!empty($forecast["list"]) && isset($forecast["list"][8])) { // ~24h sau
     }
 }
 
+// --- Dữ liệu hourly chart (8 mốc tiếp theo ~24h) ---
+$hourly = [];
+if (!empty($forecast["list"])) {
+    foreach (array_slice($forecast["list"], 0, 8) as $entry) {
+        $time = date("H:i", $entry["dt"]);
+        $hourly[] = [
+            "time" => $time,
+            "temp" => round($entry["main"]["temp"])
+        ];
+    }
+}
+
 // --- Xuất JSON ---
 echo json_encode([
     "current"    => $current,
     "forecast"   => $forecast,
     "icon"       => $iconUrl,
     "suggestion" => $suggestion,
-    "reminder"   => $reminder
+    "reminder"   => $reminder,
+    "hourly"     => $hourly
 ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);

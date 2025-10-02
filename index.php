@@ -90,42 +90,95 @@
     </div>
   </footer>
 
-  <!-- Script -->
-  <script>
-    // --- Gợi ý trang phục dựa trên nhiệt độ ---
-    function getClothingSuggestion(tempC) {
-      if (tempC <= 10) return "Áo khoác dày, áo len, khăn quàng";
-      if (tempC <= 20) return "Áo khoác nhẹ, áo dài tay";
-      if (tempC <= 30) return "Áo thun, quần dài/short";
-      return "Quần áo nhẹ, mát, đội nón khi ra nắng";
+<!-- Thêm ngay dưới phần dự báo -->
+<section id="hourly-chart" class="card">
+  <h3>Biểu đồ thời tiết theo giờ</h3>
+  <canvas id="weatherChart" height="120"></canvas>
+</section>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // --- Ví dụ dữ liệu giờ (demo) ---
+  const hourlyData = [
+    { hour: "06:00", temp: 24 },
+    { hour: "09:00", temp: 27 },
+    { hour: "12:00", temp: 30 },
+    { hour: "15:00", temp: 32 },
+    { hour: "18:00", temp: 29 },
+    { hour: "21:00", temp: 26 }
+  ];
+
+  const ctx = document.getElementById("weatherChart").getContext("2d");
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: hourlyData.map(d => d.hour),
+      datasets: [{
+        label: "Nhiệt độ (°C)",
+        data: hourlyData.map(d => d.temp),
+        borderColor: "rgba(75, 192, 192, 1)",
+        backgroundColor: "rgba(75, 192, 192, 0.2)",
+        fill: true,
+        tension: 0.3,
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(75,192,192,1)"
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true, labels: { font: { size: 14 } } }
+      },
+      scales: {
+        x: { title: { display: true, text: "Giờ" } },
+        y: { title: { display: true, text: "°C" } }
+      }
     }
+  });
+</script>
 
-    // --- Nhắc nhở cho ngày mai dựa trên dự báo ---
-    function getTomorrowReminder(forecastList) {
-      const tomorrow = forecastList[1]; // giả sử mảng forecastList thứ 2 là ngày mai
-      if (!tomorrow) return "Không có nhắc nhở đặc biệt.";
-      let reminder = "";
-      if (tomorrow.temp_max >= 35) reminder += "Uống nhiều nước, tránh nắng. ";
-      if (tomorrow.weather.toLowerCase().includes("rain")) reminder += "Mang ô hoặc áo mưa. ";
-      if (tomorrow.temp_min <= 10) reminder += "Mang áo ấm. ";
-      return reminder || "Không có nhắc nhở đặc biệt.";
-    }
+<!-- Script -->
+<script>
+  // --- Gợi ý trang phục dựa trên nhiệt độ ---
+  function getClothingSuggestion(tempC) {
+    if (tempC <= 10) return "Áo khoác dày, áo len, khăn quàng";
+    if (tempC <= 20) return "Áo khoác nhẹ, áo dài tay";
+    if (tempC <= 30) return "Áo thun, quần dài/short";
+    return "Quần áo nhẹ, mát, đội nón khi ra nắng";
+  }
 
-    // --- Ví dụ cập nhật sau khi fetch API ---
-    // Giả lập dữ liệu từ API để demo
-    const currentTempC = 28; // nhiệt độ hiện tại (°C)
-    const forecastList = [
-      { temp_min: 27, temp_max: 30, weather: "clear" },
-      { temp_min: 26, temp_max: 33, weather: "rain" }, // ngày mai
-      { temp_min: 25, temp_max: 32, weather: "clouds" },
-    ];
+  // --- Nhắc nhở cho ngày mai dựa trên dự báo ---
+  function getTomorrowReminder(forecastList) {
+    const tomorrow = forecastList[1]; // giả sử mảng forecastList thứ 2 là ngày mai
+    if (!tomorrow) return "Không có nhắc nhở đặc biệt.";
+    let reminder = "";
+    if (tomorrow.temp_max >= 35) reminder += "Uống nhiều nước, tránh nắng. ";
+    if (tomorrow.weather.toLowerCase().includes("rain")) reminder += "Mang ô hoặc áo mưa. ";
+    if (tomorrow.temp_min <= 10) reminder += "Mang áo ấm. ";
+    return reminder || "Không có nhắc nhở đặc biệt.";
+  }
 
-    document.getElementById("suggestion").textContent =
-      "Gợi ý trang phục: " + getClothingSuggestion(currentTempC);
+  // --- Ví dụ cập nhật sau khi fetch API ---
+  const currentTempC = 28; // nhiệt độ hiện tại (°C)
+  const forecastList = [
+    { temp_min: 27, temp_max: 30, weather: "clear" },
+    { temp_min: 26, temp_max: 33, weather: "rain" }, // ngày mai
+    { temp_min: 25, temp_max: 32, weather: "clouds" },
+  ];
 
-    document.getElementById("reminder").textContent =
-      "Nhắc nhở: " + getTomorrowReminder(forecastList);
-  </script>
-  <script src="./asset/app.js"></script>
+  document.getElementById("suggestion").textContent =
+    "Gợi ý trang phục: " + getClothingSuggestion(currentTempC);
+
+  document.getElementById("reminder").textContent =
+    "Nhắc nhở: " + getTomorrowReminder(forecastList);
+
+  // --- Sửa nút "Vị trí của tôi" luôn là Quy Nhơn ---
+  document.getElementById("geo-btn").addEventListener("click", () => {
+    fetchWeather("Quy Nhon"); // gọi hàm fetchWeather trong app.js
+  });
+</script>
+
+<script src="./asset/app.js"></script>
 </body>
 </html>

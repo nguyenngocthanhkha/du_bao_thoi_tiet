@@ -10,21 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Lấy vị trí hiện tại
+  // Lấy vị trí hiện tại (mặc định là Quy Nhơn)
   document.getElementById("geo-btn").addEventListener("click", () => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          fetchWeatherByCoords(position.coords.latitude, position.coords.longitude);
-        },
-        (error) => {
-          alert("Không thể lấy vị trí hiện tại: " + error.message);
-          console.error("Geolocation error:", error);
-        }
-      );
-    } else {
-      alert("Trình duyệt không hỗ trợ định vị.");
-    }
+    fetchWeather("Quy Nhon");
   });
 });
 
@@ -39,6 +27,7 @@ const cityMap = {
   "hải phòng": "Hai Phong",
   "cần thơ": "Can Tho",
   "bình định": "Binh Dinh",
+  "quy nhơn": "Quy Nhon"
 };
 
 // ====== Hàm updateUI ======
@@ -70,7 +59,7 @@ function updateUI(data) {
     iconEl.alt = weather.description;
   }
 
-  //  Gợi ý trang phục & Nhắc nhở từ weather.php
+  // 👉 Gợi ý trang phục & Nhắc nhở ngày mai
   document.getElementById("suggestion").textContent = data.suggestion || "—";
   document.getElementById("reminder").textContent   = data.reminder || "—";
 
