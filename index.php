@@ -42,7 +42,7 @@
     </div>
   </header>
 
-  <main class="container">
+  <main id="app-container"  class="container">
     <!-- Thời tiết hiện tại -->
     <section id="current" class="card current-weather" aria-live="polite">
       <div class="current-left">
