@@ -20,17 +20,17 @@ body {
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial,
     sans-serif;
   color: var(--text);
-  background: radial-gradient(1200px 800px at 10% -10%, #1a2455, var(--bg));
+  background: radial-gradient(120% 80% at 10% -10%, #1a2455, var(--bg));
 }
 
 .container {
-  max-width: 1040px;
+  max-width: 80%;
   margin: 0 auto;
-  padding: 16px;
+  padding: 2%;
 }
 
 .app-header {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 0.1em solid var(--border);
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.02),
@@ -38,47 +38,47 @@ body {
   );
   position: sticky;
   top: 0;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(0.5em);
   z-index: 10;
 }
 
 .app-title {
-  margin: 8px 0 12px;
-  font-size: 22px;
+  margin: 0.5em 0 0.8em;
+  font-size: 1.4em;
 }
 
 .controls {
   display: grid;
-  gap: 12px;
+  gap: 1em;
 }
 .control-actions {
   display: flex;
-  gap: 12px;
+  gap: 1em;
   align-items: center;
 }
 
 .search-form {
   display: flex;
-  gap: 8px;
+  gap: 0.5em;
 }
 .search-form input {
   flex: 1;
   background: #0f1533;
   color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px 14px;
+  border: 0.1em solid var(--border);
+  border-radius: 0.6em;
+  padding: 0.8em 1em;
 }
 .btn {
-  padding: 8px 16px;
-  border-radius: 6px;
+  padding: 0.5em 1em;
+  border-radius: 0.4em;
   background: #3498db;
   color: #fff;
   border: none;
-  font-size: 16px;
+  font-size: 1em;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5em;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -91,53 +91,66 @@ body {
   background: #217dbb;
 }
 
+/* Nút toggle */
 .toggle {
   position: relative;
+  width: 5em;       /* vừa đủ chứa 2 trạng thái */
+  height: 2.5em;
 }
+
 .toggle input {
   display: none;
 }
+
 .toggle label {
   display: inline-grid;
-  grid-template-columns: 1fr 28px 1fr;
+  grid-template-columns: 1fr 1fr; /* chia đều C và F */
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border: 1px solid var(--border);
+  width: 100%;
+  height: 100%;
+  border: 0.1em solid var(--border);
   border-radius: 999px;
   background: #0f1533;
-  font-size: 14px;
+  font-size: 0.9em;
   color: var(--muted);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden; /* để thumb không bị thừa */
 }
+
 .toggle .thumb {
-  width: 24px;
-  height: 24px;
-  border-radius: 999px;
-  background: var(--primary);
-  transition: transform 0.2s ease;
+  position: absolute;
+  top: 0.15em;
+  left: 0.15em;
+  width: 2.2em;      /* bằng chiều cao => hình tròn */
+  height: 2.2em;
+  border-radius: 50%;
+  background: #4b7bff;
+  transition: transform 0.25s ease;
 }
+
 .toggle input:checked + label .thumb {
-  transform: translateX(24px);
+  transform: translateX(2.5em); /* trượt vừa khít sang phải */
 }
 
 .card {
-  margin-top: 16px;
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  margin-top: 2%;
+  border: 0.1em solid var(--border);
+  border-radius: 1em;
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.02),
     rgba(0, 0, 0, 0)
   );
-  padding: 16px;
+  padding: 2%;
 }
 
 .current-weather {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 1em;
 }
-@media (min-width: 720px) {
+@media (min-width: 45em) {
   .current-weather {
     grid-template-columns: 1.2fr 1fr;
   }
@@ -146,10 +159,10 @@ body {
 .current-temp {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 1em;
 }
 .temp {
-  font-size: 40px;
+  font-size: 2.5em;
   font-weight: 700;
 }
 .desc {
@@ -157,16 +170,16 @@ body {
 }
 .details {
   display: flex;
-  gap: 16px;
+  gap: 1em;
   flex-wrap: wrap;
-  margin-top: 8px;
+  margin-top: 0.5em;
   color: var(--muted);
 }
 
 .meta {
   color: var(--muted);
   display: flex;
-  gap: 12px;
+  gap: 1em;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
@@ -174,51 +187,51 @@ body {
 .forecast-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  gap: 1em;
 }
-@media (min-width: 720px) {
+@media (min-width: 45em) {
   .forecast-list {
     grid-template-columns: repeat(5, 1fr);
   }
 }
 
 .forecast-item {
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 0.1em solid var(--border);
+  border-radius: 0.8em;
   background: #0f1533;
-  padding: 12px;
+  padding: 1em;
   display: grid;
   justify-items: center;
-  gap: 8px;
+  gap: 0.5em;
 }
 .forecast-item .day {
   color: var(--muted);
-  font-size: 14px;
+  font-size: 0.9em;
 }
 
 .app-footer {
-  border-top: 1px solid var(--border);
-  margin-top: 24px;
+  border-top: 0.1em solid var(--border);
+  margin-top: 2%;
 }
 .app-footer small {
   color: var(--muted);
 }
 
 .suggestions {
-  border: 1px solid #ccc;
+  border: 0.1em solid #ccc;
   background: #fff;
   list-style: none;
   margin: 0;
   padding: 0;
-  max-height: 150px;
+  max-height: 15em;
   overflow-y: auto;
   position: absolute;
-  width: 250px;
+  width: 60%;
   z-index: 1000;
 }
 
 .suggestions li {
-  padding: 8px;
+  padding: 0.5em;
   cursor: pointer;
 }
 
@@ -229,28 +242,28 @@ body {
 /* Empty state ban đầu */
 .empty-state {
   text-align: center;
-  padding: 60px 20px;
+  padding: 5% 2%;
   color: var(--muted);
 }
 .empty-state i {
-  font-size: 64px;
-  margin-bottom: 16px;
+  font-size: 4em;
+  margin-bottom: 1em;
   color: var(--primary);
   opacity: 0.7;
 }
 .empty-state p {
-  font-size: 16px;
+  font-size: 1em;
   line-height: 1.4;
 }
 
 /* Forecast khi chưa có dữ liệu */
 .forecast-placeholder {
   text-align: center;
-  padding: 30px;
+  padding: 2%;
   font-style: italic;
   color: var(--muted);
-  border: 1px dashed var(--border);
-  border-radius: 12px;
+  border: 0.1em dashed var(--border);
+  border-radius: 0.8em;
 }
 
 /* Khi có dữ liệu thì ẩn empty state */
