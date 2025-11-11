@@ -7,6 +7,58 @@
   --primary-600: #3e63f4;
   --border: #223;
 }
+/* Cần thêm ID "app-container" vào thẻ <main> trong HTML */
+#app-container {
+  /* Đảm bảo phần container chiếm đủ chiều cao để hiển thị background */
+  min-height: calc(
+    100vh - 80px - 50px
+  ); /* Điều chỉnh phù hợp với kích thước header/footer của bạn */
+  padding-top: 16px;
+  padding-bottom: 24px;
+
+  /* Thiết lập chung cho hình nền */
+  background-size: cover;
+  background-position: center bottom; /* Căn chỉnh cảnh quan từ phía dưới */
+  background-repeat: no-repeat;
+
+  /* Hiệu ứng chuyển đổi mượt mà khi đổi class (chuyển đổi hình nền) */
+  transition: background-image 1s ease-in-out, background-color 1s ease;
+
+  /* Màu nền mặc định nếu không có ảnh (hoặc ảnh chưa load) */
+  background-color: var(--bg);
+}
+
+/* Loại bỏ gradient mặc định của body khi dùng hình nền trong app-container */
+body {
+  background: var(--bg);
+}
+
+/* 1. NẮNG/Mây rải rác (Giống hình mẫu - màu xanh mát) */
+.weather-sunny {
+  background-image: url("./image/anhtroinang.jpg");
+}
+
+/* 2. MƯA/Dông */
+.weather-rainy {
+  background-image: url("./image/anhmua.jpg");
+}
+
+/* Khi có hình nền, ta làm cho các card trong suốt hơn để thấy được cảnh quan phía sau */
+#app-container.weather-sunny .card,
+#app-container.weather-rainy .card {
+  /* Làm nền card hơi trong suốt */
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text); /* Giữ chữ màu sáng */
+  backdrop-filter: blur(5px); /* Hiệu ứng làm mờ nền phía sau */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Viền sáng nhẹ */
+}
+
+/* Card dự báo con cũng cần trong suốt */
+#app-container.weather-sunny .forecast-item,
+#app-container.weather-rainy .forecast-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
 
 * {
   box-sizing: border-box;
