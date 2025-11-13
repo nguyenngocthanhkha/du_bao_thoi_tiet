@@ -216,8 +216,13 @@ body {
   transition: transform 0.25s ease;
 }
 
+/* Dịch chuyển sang phải chính xác */
 .toggle input:checked + label .thumb {
-  transform: translateX(2.5em); /* trượt vừa khít sang phải */
+  transform: translateX(2.45em);
+}
+
+.toggle input:checked + label .thumb {
+  transform: translateX(2.45em);
 }
 
 .card {
