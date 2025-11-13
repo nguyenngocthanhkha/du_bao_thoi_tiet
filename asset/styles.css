@@ -172,17 +172,23 @@ body {
 
 .toggle .thumb {
   position: absolute;
-  top: 0.15em;
-  left: 0.15em;
-  width: 2.2em;      /* bằng chiều cao => hình tròn */
-  height: 2.2em;
+  top: 0.2em;
+  left: 0.2em;
+  width: 2.1em;      /* nhỏ hơn một chút để nằm gọn trong khung */
+  height: 2.1em;
   border-radius: 50%;
   background: #4b7bff;
   transition: transform 0.25s ease;
 }
 
+/* Dịch chuyển sang phải chính xác */
 .toggle input:checked + label .thumb {
-  transform: translateX(2.5em); /* trượt vừa khít sang phải */
+  transform: translateX(2.45em);
+}
+
+
+.toggle input:checked + label .thumb {
+  transform: translateX(2.45em);
 }
 
 .card {
