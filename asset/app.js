@@ -61,6 +61,15 @@ function updateBackgroundAndIcon(currentWeather) {
     iconCode
   );
 
+  console.log(
+    "Weather condition:",
+    mainCondition,
+    "Icon code:",
+    iconCode,
+    "Background class:",
+    backgroundClass
+  );
+
   // 1. Cập nhật Icon (sử dụng icon URL từ PHP)
   const iconEl = document.getElementById("weather-icon");
   if (iconEl) {
@@ -83,6 +92,13 @@ function updateBackgroundAndIcon(currentWeather) {
 
     // Thêm class nền mới
     appContainer.classList.add(backgroundClass);
+    console.log(
+      "Applied background class:",
+      backgroundClass,
+      "to app-container"
+    );
+  } else {
+    console.error("app-container không tìm thấy!");
   }
 }
 
@@ -137,8 +153,13 @@ function updateUI(data) {
 
   const current = data.current;
   const weather = current.weather[0];
+
   // >>> BƯỚC QUAN TRỌNG: Gọi hàm cập nhật nền và icon <<<
+  // Truyền toàn bộ dữ liệu current từ API
   updateBackgroundAndIcon(current);
+
+  // Debug: Kiểm tra xem dữ liệu có đúng không
+  console.log("Current weather data:", current);
 
   document.getElementById("location-name").textContent = current.name;
   document.getElementById("temp").textContent =

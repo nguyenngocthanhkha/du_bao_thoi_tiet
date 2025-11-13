@@ -25,27 +25,57 @@
   transition: background-image 1s ease-in-out, background-color 1s ease;
 
   /* Màu nền mặc định nếu không có ảnh (hoặc ảnh chưa load) */
-  background-color: var(--bg);
+  /* background-color: var(--bg); */
+}
+
+/* Sử dụng bộ chọn thuộc tính CSS: [class*="..."] */
+#app-container[class*="weather-"] {
+  background-color: transparent !important;
 }
 
 /* Loại bỏ gradient mặc định của body khi dùng hình nền trong app-container */
-body {
+/* body {
   background: var(--bg);
-}
+} */
 
 /* 1. NẮNG/Mây rải rác (Giống hình mẫu - màu xanh mát) */
-.weather-sunny {
+#app-container.weather-sunny {
   background-image: url("./image/anhtroinang.jpg");
 }
 
 /* 2. MƯA/Dông */
-.weather-rainy {
+#app-container.weather-rainy {
   background-image: url("./image/anhmua.jpg");
+}
+
+/* ảnh trời âm u */
+#app-container.weather-cloudy {
+  background-image: url("./image/anhtroiamu.jpg");
+}
+
+/* Trời đêm */
+#app-container.weather-night {
+  background-image: url("./image/anhtroidem.jpg");
+}
+
+/* Trời có tuyết */
+#app-container.weather-snowy {
+  background-image: url("./image/anhtroituyet.jpg");
+}
+
+/* Mặc định */
+#app-container.weather-default {
+  background-color: var(--bg);
 }
 
 /* Khi có hình nền, ta làm cho các card trong suốt hơn để thấy được cảnh quan phía sau */
 #app-container.weather-sunny .card,
-#app-container.weather-rainy .card {
+#app-container.weather-cloudy .card,
+#app-container.weather-rainy .card,
+#app-container.weather-night .card,
+#app-container.weather-snowy .card,
+#app-container.weather-default .card,
+#app-container.weather-mukky .card {
   /* Làm nền card hơi trong suốt */
   background: rgba(255, 255, 255, 0.1);
   color: var(--text); /* Giữ chữ màu sáng */
@@ -55,7 +85,12 @@ body {
 
 /* Card dự báo con cũng cần trong suốt */
 #app-container.weather-sunny .forecast-item,
-#app-container.weather-rainy .forecast-item {
+#app-container.weather-cloudy .forecast-item,
+#app-container.weather-rainy .forecast-item,
+#app-container.weather-night .forecast-item,
+#app-container.weather-snowy .forecast-item,
+#app-container.weather-default .forecast-item,
+#app-container.weather-mukky .forecast-item {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -146,7 +181,7 @@ body {
 /* Nút toggle */
 .toggle {
   position: relative;
-  width: 5em;       /* vừa đủ chứa 2 trạng thái */
+  width: 5em; /* vừa đủ chứa 2 trạng thái */
   height: 2.5em;
 }
 
@@ -174,7 +209,7 @@ body {
   position: absolute;
   top: 0.15em;
   left: 0.15em;
-  width: 2.2em;      /* bằng chiều cao => hình tròn */
+  width: 2.2em; /* bằng chiều cao => hình tròn */
   height: 2.2em;
   border-radius: 50%;
   background: #4b7bff;
