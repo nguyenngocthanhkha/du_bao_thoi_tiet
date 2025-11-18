@@ -106,6 +106,71 @@ function updateBackgroundAndIcon(currentWeather) {
 // KẾT THÚC LOGIC CẬP NHẬT BACKGROUND VÀ ICON
 // ==========================================================
 
+// ==========================================================
+// LOGIC CHUYỂN ĐỔI ĐỘ C / ĐỘ F
+// ==========================================================
+
+// Biến lưu trữ đơn vị nhiệt độ hiện tại (mặc định là Celsius)
+let currentUnit = "C";
+
+// Biến lưu trữ dữ liệu thời tiết hiện tại
+let currentWeatherData = null;
+
+// Hàm chuyển đổi từ Celsius sang Fahrenheit
+function celsiusToFahrenheit(celsius) {
+  return (celsius * 9) / 5 + 32;
+}
+
+// Hàm cập nhật hiển thị nhiệt độ khi chuyển đổi đơn vị
+function updateTemperatureDisplay() {
+  if (!currentWeatherData) return;
+
+  const current = currentWeatherData.current;
+  const unitSymbol = currentUnit === "C" ? "°C" : "°F";
+
+  // Cập nhật nhiệt độ hiện tại
+  let temp = current.main.temp;
+  if (currentUnit === "F") {
+    temp = celsiusToFahrenheit(temp);
+  }
+  const tempElement = document.getElementById("temp");
+  if (tempElement) {
+    tempElement.textContent = Math.round(temp) + unitSymbol;
+  }
+
+  // Cập nhật nhiệt độ dự báo
+  const forecastList = document.getElementById("forecast-list");
+  if (forecastList) {
+    const forecastItems = forecastList.querySelectorAll(".forecast-item");
+    
+    const daily = {};
+    currentWeatherData.forecast.list.forEach((item) => {
+      const day = new Date(item.dt * 1000).toLocaleDateString("vi-VN");
+      if (!daily[day]) {
+        daily[day] = item;
+      }
+    });
+
+    const dailyArray = Object.values(daily).slice(0, 5);
+    forecastItems.forEach((item, index) => {
+      if (dailyArray[index]) {
+        let forecastTemp = dailyArray[index].main.temp;
+        if (currentUnit === "F") {
+          forecastTemp = celsiusToFahrenheit(forecastTemp);
+        }
+        // Cập nhật nhiệt độ trong forecast item (span thứ 3)
+        const tempSpan = item.querySelector("span:nth-child(3)");
+        if (tempSpan) {
+          tempSpan.textContent = Math.round(forecastTemp) + unitSymbol;
+        }
+      }
+    });
+  }
+}
+// ==========================================================
+// KẾT THÚC LOGIC CHUYỂN ĐỔI ĐỘ C / ĐỘ F
+// ==========================================================
+
 document.addEventListener("DOMContentLoaded", () => {
   fetchWeather("Hanoi"); // mặc định khi mở trang
 
@@ -122,6 +187,16 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("geo-btn").addEventListener("click", () => {
     fetchWeather("Quy Nhon");
   });
+
+  // Event listener cho nút toggle chuyển đổi đơn vị
+  const unitToggle = document.getElementById("unit-toggle");
+  if (unitToggle) {
+    unitToggle.addEventListener("change", (e) => {
+      // Nếu checkbox được check thì chuyển sang Fahrenheit, ngược lại là Celsius
+      currentUnit = e.target.checked ? "F" : "C";
+      updateTemperatureDisplay();
+    });
+  }
 });
 
 // Map tên tiếng Việt sang chuẩn tiếng Anh cho OpenWeather
@@ -140,6 +215,9 @@ const cityMap = {
 
 // ====== Hàm updateUI ======
 function updateUI(data) {
+  // Lưu trữ dữ liệu thời tiết hiện tại để sử dụng cho chuyển đổi đơn vị
+  currentWeatherData = data;
+
   // Đồng hồ
   function updateClock() {
     const now = new Date();
@@ -162,8 +240,16 @@ function updateUI(data) {
   console.log("Current weather data:", current);
 
   document.getElementById("location-name").textContent = current.name;
+  
+  // Hiển thị nhiệt độ theo đơn vị hiện tại
+  const unitSymbol = currentUnit === "C" ? "°C" : "°F";
+  let temp = current.main.temp;
+  if (currentUnit === "F") {
+    temp = celsiusToFahrenheit(temp);
+  }
   document.getElementById("temp").textContent =
-    Math.round(current.main.temp) + "°C";
+    Math.round(temp) + unitSymbol;
+  
   document.getElementById("desc").textContent = weather.description;
   document.getElementById("humidity").textContent =
     "Độ ẩm: " + current.main.humidity + "%";
@@ -194,12 +280,18 @@ function updateUI(data) {
     .forEach((item) => {
       const fIconUrl = `https://openweathermap.org/img/wn/${item.weather[0].icon}.png`;
 
+      // Chuyển đổi nhiệt độ theo đơn vị hiện tại
+      let forecastTemp = item.main.temp;
+      if (currentUnit === "F") {
+        forecastTemp = celsiusToFahrenheit(forecastTemp);
+      }
+
       const el = document.createElement("div");
       el.classList.add("forecast-item");
       el.innerHTML = `
       <span>${new Date(item.dt * 1000).toLocaleDateString("vi-VN")}</span>
       <img src="${fIconUrl}" alt="${item.weather[0].description}">
-      <span>${Math.round(item.main.temp)}°C</span>
+      <span>${Math.round(forecastTemp)}${unitSymbol}</span>
       <span>${item.weather[0].description}</span>
     `;
       forecastList.appendChild(el);
