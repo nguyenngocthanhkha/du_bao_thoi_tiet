@@ -32,7 +32,7 @@
           <div class="toggle">
             <input type="checkbox" id="unit-toggle" />
             <label for="unit-toggle" title="Chuyển °C / °F">
-              <span> °C</span>
+              <span>°C</span>
               <span class="thumb"></span>
               <span>°F</span>
             </label>
