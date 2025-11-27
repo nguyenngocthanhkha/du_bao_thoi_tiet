@@ -3,7 +3,8 @@ header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=utf-8");
 
 // --- API Key ---
-$apiKey = "7e1a92020fb10446446cb82105d49457";
+// $apiKey = "7e1a92020fb10446446cb82105d49457";
+$apiKey = "9e74dda636db58c18120b15630a121f8";
 
 // --- Hàm gọi API ---
 function callAPI($url) {
@@ -34,16 +35,14 @@ function callAPI($url) {
 }
 
 // --- Xác định query ---
-// Bấm "Vị trí của tôi" -> luôn là Quy Nhơn
 if (isset($_GET["geo"])) {
     $city = "Quy Nhon";
-    $urlCurrent  = "https://api.openweathermap.org/data/2.5/weather?q={$city}&appid={$apiKey}&lang=vi&units=metric";
-    $urlForecast = "https://api.openweathermap.org/data/2.5/forecast?q={$city}&appid={$apiKey}&lang=vi&units=metric";
 } else {
     $city = isset($_GET["city"]) ? urlencode($_GET["city"]) : "Hanoi";
-    $urlCurrent  = "https://api.openweathermap.org/data/2.5/weather?q={$city}&appid={$apiKey}&lang=vi&units=metric";
-    $urlForecast = "https://api.openweathermap.org/data/2.5/forecast?q={$city}&appid={$apiKey}&lang=vi&units=metric";
 }
+
+$urlCurrent  = "https://api.openweathermap.org/data/2.5/weather?q={$city}&appid={$apiKey}&lang=vi&units=metric";
+$urlForecast = "https://api.openweathermap.org/data/2.5/forecast?q={$city}&appid={$apiKey}&lang=vi&units=metric";
 
 // --- Gọi API ---
 $current  = callAPI($urlCurrent);
@@ -61,10 +60,7 @@ if (isset($current["error"]) || isset($forecast["error"])) {
 // --- Xử lý dữ liệu ---
 $temp = $current["main"]["temp"] ?? 0;
 $desc = strtolower($current["weather"][0]["description"] ?? "");
-$icon = $current["weather"][0]["icon"] ?? "01d";
-
-// Link icon chuẩn OpenWeather
-$iconUrl = "https://openweathermap.org/img/wn/{$icon}@2x.png";
+$iconCode = $current["weather"][0]["icon"] ?? "01d"; // Trả icon code để front-end map
 
 // Gợi ý trang phục
 $suggestion = "Hôm nay thời tiết dễ chịu.";
@@ -78,30 +74,22 @@ if (strpos($desc, "mưa") !== false) {
 
 // Nhắc nhở ngày mai
 $reminder = "Không có nhắc nhở đặc biệt.";
-if (!empty($forecast["list"]) && isset($forecast["list"][8])) { // ~24h sau
+if (!empty($forecast["list"]) && isset($forecast["list"][8])) {
     $tomorrowDesc = strtolower($forecast["list"][8]["weather"][0]["description"] ?? "");
     $tomorrowTemp = $forecast["list"][8]["main"]["temp"] ?? null;
 
     $reminderArr = [];
-    if (strpos($tomorrowDesc, "mưa") !== false) {
-        $reminderArr[] = "Ngày mai có mưa, nhớ mang ô nhé ☔";
-    }
-    if (strpos($tomorrowDesc, "nắng") !== false) {
-        $reminderArr[] = "Ngày mai trời nắng, bôi kem chống nắng 🌞";
-    }
+    if (strpos($tomorrowDesc, "mưa") !== false) $reminderArr[] = "Ngày mai có mưa, nhớ mang ô nhé ☔";
+    if (strpos($tomorrowDesc, "nắng") !== false) $reminderArr[] = "Ngày mai trời nắng, bôi kem chống nắng 🌞";
     if ($tomorrowTemp !== null) {
         if ($tomorrowTemp <= 10) $reminderArr[] = "Ngày mai lạnh, mang áo ấm 🧥";
         if ($tomorrowTemp >= 35) $reminderArr[] = "Ngày mai nóng, uống nhiều nước 💧";
     }
 
-    if (!empty($reminderArr)) {
-        $reminder = implode(" | ", $reminderArr);
-    } else {
-        $reminder = "Ngày mai thời tiết khá ổn ✅";
-    }
+    $reminder = !empty($reminderArr) ? implode(" | ", $reminderArr) : "Ngày mai thời tiết khá ổn ✅";
 }
 
-// --- Dữ liệu hourly chart (8 mốc tiếp theo ~24h) ---
+// Dữ liệu hourly chart (8 mốc tiếp theo ~24h)
 $hourly = [];
 if (!empty($forecast["list"])) {
     foreach (array_slice($forecast["list"], 0, 8) as $entry) {
@@ -113,12 +101,13 @@ if (!empty($forecast["list"])) {
     }
 }
 
-// --- Xuất JSON ---
+// Xuất JSON
 echo json_encode([
     "current"    => $current,
     "forecast"   => $forecast,
-    "icon"       => $iconUrl,
+    "iconCode"   => $iconCode, // trả code để map icon động
     "suggestion" => $suggestion,
     "reminder"   => $reminder,
     "hourly"     => $hourly
 ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+ 
