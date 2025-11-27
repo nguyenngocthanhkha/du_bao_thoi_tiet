@@ -138,6 +138,16 @@ function updateTemperatureDisplay() {
     tempElement.textContent = Math.round(temp) + unitSymbol;
   }
 
+  // Cập nhật "feels like"
+  let feelsLike = current.main.feels_like;
+  if (currentUnit === "F") {
+    feelsLike = celsiusToFahrenheit(feelsLike);
+  }
+  const feelsElement = document.getElementById("feels");
+  if (feelsElement) {
+    feelsElement.textContent = "Cảm giác: " + Math.round(feelsLike) + unitSymbol;
+  }
+
   // Cập nhật nhiệt độ dự báo
   const forecastList = document.getElementById("forecast-list");
   if (forecastList) {
@@ -165,6 +175,22 @@ function updateTemperatureDisplay() {
         }
       }
     });
+  }
+  
+  // Cập nhật biểu đồ nếu có
+  if (weatherChart && currentWeatherData) {
+    if (currentWeatherData.hourly && currentWeatherData.hourly.length > 0) {
+      updateHourlyChart(currentWeatherData.hourly);
+    } else if (currentWeatherData.forecast && currentWeatherData.forecast.list) {
+      const hourlyData = currentWeatherData.forecast.list.slice(0, 8).map(item => ({
+        time: new Date(item.dt * 1000).toLocaleTimeString("vi-VN", {
+          hour: "2-digit",
+          minute: "2-digit"
+        }),
+        temp: Math.round(item.main.temp)
+      }));
+      updateHourlyChart(hourlyData);
+    }
   }
 }
 // ==========================================================
@@ -251,6 +277,15 @@ function updateUI(data) {
     Math.round(temp) + unitSymbol;
   
   document.getElementById("desc").textContent = weather.description;
+  
+  // Cập nhật "feels like" (cảm giác)
+  let feelsLike = current.main.feels_like;
+  if (currentUnit === "F") {
+    feelsLike = celsiusToFahrenheit(feelsLike);
+  }
+  document.getElementById("feels").textContent =
+    "Cảm giác: " + Math.round(feelsLike) + unitSymbol;
+  
   document.getElementById("humidity").textContent =
     "Độ ẩm: " + current.main.humidity + "%";
   document.getElementById("wind").textContent =
@@ -258,6 +293,20 @@ function updateUI(data) {
   document.getElementById("date").textContent = new Date(
     current.dt * 1000
   ).toLocaleString("vi-VN");
+
+  // Cập nhật mặt trời mọc/lặn
+  if (current.sys && current.sys.sunrise && current.sys.sunset) {
+    const sunrise = new Date(current.sys.sunrise * 1000).toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+    const sunset = new Date(current.sys.sunset * 1000).toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+    document.getElementById("sun").textContent =
+      `Mặt trời mọc/lặn: ${sunrise} / ${sunset}`;
+  }
 
   // 👉 Gợi ý trang phục & Nhắc nhở ngày mai
   document.getElementById("suggestion").textContent = data.suggestion || "—";
@@ -296,6 +345,74 @@ function updateUI(data) {
     `;
       forecastList.appendChild(el);
     });
+
+  // Cập nhật biểu đồ Chart.js với dữ liệu hourly
+  if (data.hourly && data.hourly.length > 0) {
+    updateHourlyChart(data.hourly);
+  } else if (data.forecast && data.forecast.list) {
+    // Nếu không có hourly, lấy từ forecast list (8 mốc đầu tiên)
+    const hourlyData = data.forecast.list.slice(0, 8).map(item => ({
+      time: new Date(item.dt * 1000).toLocaleTimeString("vi-VN", {
+        hour: "2-digit",
+        minute: "2-digit"
+      }),
+      temp: Math.round(item.main.temp)
+    }));
+    updateHourlyChart(hourlyData);
+  }
+}
+
+// Hàm cập nhật biểu đồ Chart.js
+let weatherChart = null;
+function updateHourlyChart(hourlyData) {
+  const ctx = document.getElementById("weatherChart");
+  if (!ctx) return;
+
+  const labels = hourlyData.map(d => d.time);
+  const temps = hourlyData.map(d => {
+    let temp = d.temp;
+    if (currentUnit === "F") {
+      temp = celsiusToFahrenheit(temp);
+    }
+    return temp;
+  });
+
+  if (weatherChart) {
+    // Cập nhật biểu đồ hiện có
+    weatherChart.data.labels = labels;
+    weatherChart.data.datasets[0].data = temps;
+    weatherChart.data.datasets[0].label = `Nhiệt độ (${currentUnit === "C" ? "°C" : "°F"})`;
+    weatherChart.options.scales.y.title.text = currentUnit === "C" ? "°C" : "°F";
+    weatherChart.update();
+  } else {
+    // Tạo biểu đồ mới
+    weatherChart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: `Nhiệt độ (${currentUnit === "C" ? "°C" : "°F"})`,
+          data: temps,
+          borderColor: "rgba(75, 192, 192, 1)",
+          backgroundColor: "rgba(75, 192, 192, 0.2)",
+          fill: true,
+          tension: 0.3,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(75,192,192,1)"
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true, labels: { font: { size: 14 } } }
+        },
+        scales: {
+          x: { title: { display: true, text: "Giờ" } },
+          y: { title: { display: true, text: currentUnit === "C" ? "°C" : "°F" } }
+        }
+      }
+    });
+  }
 }
 
 // Hiển thị lỗi
