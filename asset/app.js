@@ -234,4 +234,6 @@ if (unitToggle) {
 }
 
 // Load mặc định
-fetchWeather("Hanoi")
+fetchWeather("Hanoi");
+
+}
