@@ -1,202 +1,3 @@
-/**
- * Ánh xạ trạng thái thời tiết (weather main) và mã icon sang class CSS nền và icon URL.
- * @param {string} weatherMain - Trạng thái thời tiết chính (ví dụ: 'Clear', 'Rain', 'Clouds').
- * @param {string} iconCode - Mã icon (ví dụ: '01d', '10n').
- * @returns {object} { backgroundClass: string, iconUrl: string }
- */
-function getWeatherMapping(weatherMain, iconCode) {
-  const isDay = iconCode.endsWith("d");
-  let backgroundClass = "weather-default";
-  const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-
-  switch (weatherMain.toLowerCase()) {
-    case "clear":
-      backgroundClass = isDay ? "weather-sunny" : "weather-night";
-      break;
-
-    case "clouds":
-      // Sử dụng "sunny" cho mây rải rác nhẹ (02d) hoặc "cloudy" cho mây u ám (04d)
-      if (iconCode === "02d" || iconCode === "02n") {
-        backgroundClass = isDay ? "weather-sunny" : "weather-night"; // Vẫn sáng/quang nếu mây nhẹ
-      } else {
-        backgroundClass = "weather-cloudy"; // Mây u ám
-      }
-      break;
-
-    case "rain":
-    case "drizzle":
-    case "thunderstorm":
-      backgroundClass = "weather-rainy";
-      break;
-
-    case "snow":
-      backgroundClass = "weather-snowy"; // Cần định nghĩa trong CSS nếu có ảnh tuyết
-      break;
-
-    case "mist":
-    case "smoke":
-    case "haze":
-      backgroundClass = "weather-cloudy"; // Sương mù/Mù
-      break;
-
-    default:
-      backgroundClass = "weather-default";
-      break;
-  }
-
-  return { backgroundClass, iconUrl };
-}
-
-/**
- * Hàm cập nhật Icon và Background cho giao diện.
- * Sử dụng hàm getWeatherMapping để xác định class CSS nền.
- * @param {object} currentWeather - Dữ liệu thời tiết hiện tại (data.current)
- */
-function updateBackgroundAndIcon(currentWeather) {
-  const mainCondition = currentWeather.weather[0].main;
-  const iconCode = currentWeather.weather[0].icon;
-
-  const { backgroundClass, iconUrl } = getWeatherMapping(
-    mainCondition,
-    iconCode
-  );
-
-  console.log(
-    "Weather condition:",
-    mainCondition,
-    "Icon code:",
-    iconCode,
-    "Background class:",
-    backgroundClass
-  );
-
-  // 1. Cập nhật Icon (sử dụng icon URL từ PHP)
-  const iconEl = document.getElementById("weather-icon");
-  if (iconEl) {
-    iconEl.src = iconUrl;
-    iconEl.alt = currentWeather.weather[0].description;
-  }
-
-  // 2. Cập nhật Background
-  const appContainer = document.getElementById("app-container");
-  if (appContainer) {
-    // Xóa tất cả các class nền cũ đã định nghĩa
-    appContainer.classList.remove(
-      "weather-sunny",
-      "weather-rainy",
-      "weather-cloudy",
-      "weather-night",
-      "weather-snowy",
-      "weather-default"
-    );
-
-    // Thêm class nền mới
-    appContainer.classList.add(backgroundClass);
-    console.log(
-      "Applied background class:",
-      backgroundClass,
-      "to app-container"
-    );
-  } else {
-    console.error("app-container không tìm thấy!");
-  }
-}
-
-// ==========================================================
-// KẾT THÚC LOGIC CẬP NHẬT BACKGROUND VÀ ICON
-// ==========================================================
-
-// ==========================================================
-// LOGIC CHUYỂN ĐỔI ĐỘ C / ĐỘ F
-// ==========================================================
-
-// Biến lưu trữ đơn vị nhiệt độ hiện tại (mặc định là Celsius)
-let currentUnit = "C";
-
-// Biến lưu trữ dữ liệu thời tiết hiện tại
-let currentWeatherData = null;
-
-// Hàm chuyển đổi từ Celsius sang Fahrenheit
-function celsiusToFahrenheit(celsius) {
-  return (celsius * 9) / 5 + 32;
-}
-
-// Hàm cập nhật hiển thị nhiệt độ khi chuyển đổi đơn vị
-function updateTemperatureDisplay() {
-  if (!currentWeatherData) return;
-
-  const current = currentWeatherData.current;
-  const unitSymbol = currentUnit === "C" ? "°C" : "°F";
-
-  // Cập nhật nhiệt độ hiện tại
-  let temp = current.main.temp;
-  if (currentUnit === "F") {
-    temp = celsiusToFahrenheit(temp);
-  }
-  const tempElement = document.getElementById("temp");
-  if (tempElement) {
-    tempElement.textContent = Math.round(temp) + unitSymbol;
-  }
-
-  // Cập nhật "feels like"
-  let feelsLike = current.main.feels_like;
-  if (currentUnit === "F") {
-    feelsLike = celsiusToFahrenheit(feelsLike);
-  }
-  const feelsElement = document.getElementById("feels");
-  if (feelsElement) {
-    feelsElement.textContent = "Cảm giác: " + Math.round(feelsLike) + unitSymbol;
-  }
-
-  // Cập nhật nhiệt độ dự báo
-  const forecastList = document.getElementById("forecast-list");
-  if (forecastList) {
-    const forecastItems = forecastList.querySelectorAll(".forecast-item");
-    
-    const daily = {};
-    currentWeatherData.forecast.list.forEach((item) => {
-      const day = new Date(item.dt * 1000).toLocaleDateString("vi-VN");
-      if (!daily[day]) {
-        daily[day] = item;
-      }
-    });
-
-    const dailyArray = Object.values(daily).slice(0, 5);
-    forecastItems.forEach((item, index) => {
-      if (dailyArray[index]) {
-        let forecastTemp = dailyArray[index].main.temp;
-        if (currentUnit === "F") {
-          forecastTemp = celsiusToFahrenheit(forecastTemp);
-        }
-        // Cập nhật nhiệt độ trong forecast item (span thứ 3)
-        const tempSpan = item.querySelector("span:nth-child(3)");
-        if (tempSpan) {
-          tempSpan.textContent = Math.round(forecastTemp) + unitSymbol;
-        }
-      }
-    });
-  }
-  
-  // Cập nhật biểu đồ nếu có
-  if (weatherChart && currentWeatherData) {
-    if (currentWeatherData.hourly && currentWeatherData.hourly.length > 0) {
-      updateHourlyChart(currentWeatherData.hourly);
-    } else if (currentWeatherData.forecast && currentWeatherData.forecast.list) {
-      const hourlyData = currentWeatherData.forecast.list.slice(0, 8).map(item => ({
-        time: new Date(item.dt * 1000).toLocaleTimeString("vi-VN", {
-          hour: "2-digit",
-          minute: "2-digit"
-        }),
-        temp: Math.round(item.main.temp)
-      }));
-      updateHourlyChart(hourlyData);
-    }
-  }
-}
-// ==========================================================
-// KẾT THÚC LOGIC CHUYỂN ĐỔI ĐỘ C / ĐỘ F
-// ==========================================================
-
 document.addEventListener("DOMContentLoaded", () => {
   fetchWeather("Hanoi"); // mặc định khi mở trang
 
@@ -209,26 +10,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Lấy vị trí hiện tại (mặc định là Quy Nhơn)
+  // Lấy vị trí hiện tại
   document.getElementById("geo-btn").addEventListener("click", () => {
-    fetchWeather("Quy Nhon");
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          fetchWeatherByCoords(position.coords.latitude, position.coords.longitude);
+        },
+        (error) => {
+          alert("Không thể lấy vị trí hiện tại: " + error.message);
+          console.error("Geolocation error:", error);
+        }
+      );
+    } else {
+      alert("Trình duyệt không hỗ trợ định vị.");
+    }
   });
-
-  // Event listener cho nút toggle chuyển đổi đơn vị
-  const unitToggle = document.getElementById("unit-toggle");
-  if (unitToggle) {
-    unitToggle.addEventListener("change", (e) => {
-      // Nếu checkbox được check thì chuyển sang Fahrenheit, ngược lại là Celsius
-      currentUnit = e.target.checked ? "F" : "C";
-      updateTemperatureDisplay();
-    });
-  }
 });
 
 // Map tên tiếng Việt sang chuẩn tiếng Anh cho OpenWeather
 const cityMap = {
   "hà nội": "Hanoi",
-  hn: "Hanoi",
+  "hn": "Hanoi",
   "thành phố hồ chí minh": "Ho Chi Minh",
   "hồ chí minh": "Ho Chi Minh",
   "sài gòn": "Ho Chi Minh",
@@ -236,19 +39,14 @@ const cityMap = {
   "hải phòng": "Hai Phong",
   "cần thơ": "Can Tho",
   "bình định": "Binh Dinh",
-  "quy nhơn": "Quy Nhon",
 };
 
-// ====== Hàm updateUI ======
+// Cập nhật giao diện
 function updateUI(data) {
-  // Lưu trữ dữ liệu thời tiết hiện tại để sử dụng cho chuyển đổi đơn vị
-  currentWeatherData = data;
-
   // Đồng hồ
   function updateClock() {
     const now = new Date();
-    document.getElementById("clock").textContent =
-      now.toLocaleTimeString("vi-VN");
+    document.getElementById("clock").textContent = now.toLocaleTimeString("vi-VN");
   }
   if (!window.clockInterval) {
     window.clockInterval = setInterval(updateClock, 1000);
@@ -258,59 +56,20 @@ function updateUI(data) {
   const current = data.current;
   const weather = current.weather[0];
 
-  // >>> BƯỚC QUAN TRỌNG: Gọi hàm cập nhật nền và icon <<<
-  // Truyền toàn bộ dữ liệu current từ API
-  updateBackgroundAndIcon(current);
-
-  // Debug: Kiểm tra xem dữ liệu có đúng không
-  console.log("Current weather data:", current);
-
   document.getElementById("location-name").textContent = current.name;
-  
-  // Hiển thị nhiệt độ theo đơn vị hiện tại
-  const unitSymbol = currentUnit === "C" ? "°C" : "°F";
-  let temp = current.main.temp;
-  if (currentUnit === "F") {
-    temp = celsiusToFahrenheit(temp);
-  }
-  document.getElementById("temp").textContent =
-    Math.round(temp) + unitSymbol;
-  
+  document.getElementById("temp").textContent = Math.round(current.main.temp) + "°C";
   document.getElementById("desc").textContent = weather.description;
-  
-  // Cập nhật "feels like" (cảm giác)
-  let feelsLike = current.main.feels_like;
-  if (currentUnit === "F") {
-    feelsLike = celsiusToFahrenheit(feelsLike);
-  }
-  document.getElementById("feels").textContent =
-    "Cảm giác: " + Math.round(feelsLike) + unitSymbol;
-  
-  document.getElementById("humidity").textContent =
-    "Độ ẩm: " + current.main.humidity + "%";
-  document.getElementById("wind").textContent =
-    "Gió: " + current.wind.speed + " m/s";
-  document.getElementById("date").textContent = new Date(
-    current.dt * 1000
-  ).toLocaleString("vi-VN");
+  document.getElementById("humidity").textContent = "Độ ẩm: " + current.main.humidity + "%";
+  document.getElementById("wind").textContent = "Gió: " + current.wind.speed + " m/s";
+  document.getElementById("date").textContent = new Date(current.dt * 1000).toLocaleString("vi-VN");
 
-  // Cập nhật mặt trời mọc/lặn
-  if (current.sys && current.sys.sunrise && current.sys.sunset) {
-    const sunrise = new Date(current.sys.sunrise * 1000).toLocaleTimeString("vi-VN", {
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-    const sunset = new Date(current.sys.sunset * 1000).toLocaleTimeString("vi-VN", {
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-    document.getElementById("sun").textContent =
-      `Mặt trời mọc/lặn: ${sunrise} / ${sunset}`;
+  // Icon hiện tại
+  const iconUrl = `https://openweathermap.org/img/wn/${weather.icon}@2x.png`;
+  const iconEl = document.getElementById("weather-icon");
+  if (iconEl) {
+    iconEl.src = iconUrl;
+    iconEl.alt = weather.description;
   }
-
-  // 👉 Gợi ý trang phục & Nhắc nhở ngày mai
-  document.getElementById("suggestion").textContent = data.suggestion || "—";
-  document.getElementById("reminder").textContent = data.reminder || "—";
 
   // Forecast 5 ngày
   const forecastList = document.getElementById("forecast-list");
@@ -324,95 +83,19 @@ function updateUI(data) {
     }
   });
 
-  Object.values(daily)
-    .slice(0, 5)
-    .forEach((item) => {
-      const fIconUrl = `https://openweathermap.org/img/wn/${item.weather[0].icon}.png`;
+  Object.values(daily).slice(0, 5).forEach((item) => {
+    const fIconUrl = `https://openweathermap.org/img/wn/${item.weather[0].icon}.png`;
 
-      // Chuyển đổi nhiệt độ theo đơn vị hiện tại
-      let forecastTemp = item.main.temp;
-      if (currentUnit === "F") {
-        forecastTemp = celsiusToFahrenheit(forecastTemp);
-      }
-
-      const el = document.createElement("div");
-      el.classList.add("forecast-item");
-      el.innerHTML = `
+    const el = document.createElement("div");
+    el.classList.add("forecast-item");
+    el.innerHTML = `
       <span>${new Date(item.dt * 1000).toLocaleDateString("vi-VN")}</span>
       <img src="${fIconUrl}" alt="${item.weather[0].description}">
-      <span>${Math.round(forecastTemp)}${unitSymbol}</span>
+      <span>${Math.round(item.main.temp)}°C</span>
       <span>${item.weather[0].description}</span>
     `;
-      forecastList.appendChild(el);
-    });
-
-  // Cập nhật biểu đồ Chart.js với dữ liệu hourly
-  if (data.hourly && data.hourly.length > 0) {
-    updateHourlyChart(data.hourly);
-  } else if (data.forecast && data.forecast.list) {
-    // Nếu không có hourly, lấy từ forecast list (8 mốc đầu tiên)
-    const hourlyData = data.forecast.list.slice(0, 8).map(item => ({
-      time: new Date(item.dt * 1000).toLocaleTimeString("vi-VN", {
-        hour: "2-digit",
-        minute: "2-digit"
-      }),
-      temp: Math.round(item.main.temp)
-    }));
-    updateHourlyChart(hourlyData);
-  }
-}
-
-// Hàm cập nhật biểu đồ Chart.js
-let weatherChart = null;
-function updateHourlyChart(hourlyData) {
-  const ctx = document.getElementById("weatherChart");
-  if (!ctx) return;
-
-  const labels = hourlyData.map(d => d.time);
-  const temps = hourlyData.map(d => {
-    let temp = d.temp;
-    if (currentUnit === "F") {
-      temp = celsiusToFahrenheit(temp);
-    }
-    return temp;
+    forecastList.appendChild(el);
   });
-
-  if (weatherChart) {
-    // Cập nhật biểu đồ hiện có
-    weatherChart.data.labels = labels;
-    weatherChart.data.datasets[0].data = temps;
-    weatherChart.data.datasets[0].label = `Nhiệt độ (${currentUnit === "C" ? "°C" : "°F"})`;
-    weatherChart.options.scales.y.title.text = currentUnit === "C" ? "°C" : "°F";
-    weatherChart.update();
-  } else {
-    // Tạo biểu đồ mới
-    weatherChart = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: labels,
-        datasets: [{
-          label: `Nhiệt độ (${currentUnit === "C" ? "°C" : "°F"})`,
-          data: temps,
-          borderColor: "rgba(75, 192, 192, 1)",
-          backgroundColor: "rgba(75, 192, 192, 0.2)",
-          fill: true,
-          tension: 0.3,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(75,192,192,1)"
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: true, labels: { font: { size: 14 } } }
-        },
-        scales: {
-          x: { title: { display: true, text: "Giờ" } },
-          y: { title: { display: true, text: currentUnit === "C" ? "°C" : "°F" } }
-        }
-      }
-    });
-  }
 }
 
 // Hiển thị lỗi
@@ -425,11 +108,9 @@ function displayError(message) {
   document.getElementById("date").textContent = "";
   document.getElementById("forecast-list").innerHTML = "";
 
-  const iconEl = document.getElementById("weather-icon");
-  if (iconEl) iconEl.src = "";
-}
+const unitToggle = document.getElementById("unit-toggle");
 
-// Lấy thời tiết theo tên thành phố
+// Hàm fetch dữ liệu thời tiết
 async function fetchWeather(city) {
   try {
     let normalizedCity = city.trim();
@@ -438,29 +119,119 @@ async function fetchWeather(city) {
       normalizedCity = cityMap[key];
     }
 
-    const res = await fetch(
-      `weather.php?city=${encodeURIComponent(normalizedCity)}`
-    );
+    const res = await fetch(`weather.php?city=${encodeURIComponent(normalizedCity)}`);
     if (!res.ok) throw new Error("Lỗi kết nối server");
     const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    updateUI(data);
+
+    if (data.cod !== 200) {
+      locationName.textContent = "Không tìm thấy thành phố!";
+      return;
+    }
+
+    renderCurrentWeather(data);
+
+    // gọi forecast
+    fetchForecast(city);
+
   } catch (err) {
-    console.error("Lỗi:", err.message);
-    displayError(err.message);
+    console.error("Lỗi fetch:", err);
   }
 }
 
-// Lấy thời tiết theo tọa độ
-async function fetchWeatherByCoords(lat, lon) {
+// Hàm fetch dự báo
+async function fetchForecast(city) {
   try {
-    const res = await fetch(`weather.php?lat=${lat}&lon=${lon}`);
-    if (!res.ok) throw new Error("Lỗi kết nối server");
+    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric&lang=vi`;
+    const res = await fetch(url);
     const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    updateUI(data);
+
+    forecastList.innerHTML = "";
+
+    // lọc lấy 1 mốc giờ mỗi ngày (ví dụ 12:00)
+    const daily = data.list.filter(item => item.dt_txt.includes("12:00:00"));
+
+    daily.forEach(day => {
+      renderForecast(day);
+    });
+
   } catch (err) {
-    console.error("Lỗi:", err.message);
-    displayError(err.message);
+    console.error("Lỗi forecast:", err);
   }
 }
+
+// Render thời tiết hiện tại
+function renderCurrentWeather(data) {
+  const city = data.name;
+  const tempC = data.main.temp;
+  const tempF = tempC * 9/5 + 32;
+
+  locationName.textContent = city;
+  descEl.textContent = data.weather[0].description;
+  weatherIcon.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+
+  // gán dataset
+  tempEl.dataset.celsius = tempC;
+  tempEl.dataset.fahrenheit = tempF;
+
+  tempEl.textContent = unitToggle.checked 
+    ? Math.round(tempF) + "°F"
+    : Math.round(tempC) + "°C";
+
+  feelsEl.textContent = "Cảm giác: " + Math.round(data.main.feels_like) + "°C";
+  humidityEl.textContent = "Độ ẩm: " + data.main.humidity + "%";
+  windEl.textContent = "Gió: " + data.wind.speed + " m/s";
+}
+
+// Render dự báo
+function renderForecast(day) {
+  const tempC = day.main.temp;
+  const tempF = tempC * 9/5 + 32;
+
+  const el = document.createElement("div");
+  el.classList.add("forecast-item");
+
+  el.innerHTML = `
+    <div>${new Date(day.dt * 1000).toLocaleDateString("vi-VN", { weekday: "short" })}</div>
+    <img src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png" alt="">
+    <div class="forecast-temp" 
+         data-celsius="${tempC}" 
+         data-fahrenheit="${tempF}">
+         ${unitToggle.checked ? Math.round(tempF) + "°F" : Math.round(tempC) + "°C"}
+    </div>
+  `;
+
+  forecastList.appendChild(el);
+}
+
+// Lắng nghe form search
+searchForm.addEventListener("submit", e => {
+  e.preventDefault();
+  const city = cityInput.value.trim();
+  if (city) {
+    fetchWeather(city);
+  }
+});
+
+// Toggle °C/°F
+if (unitToggle) {
+  unitToggle.addEventListener("change", () => {
+    const useF = unitToggle.checked;
+
+    // nhiệt độ hiện tại
+    if (tempEl.dataset.celsius && tempEl.dataset.fahrenheit) {
+      tempEl.textContent = useF
+        ? Math.round(tempEl.dataset.fahrenheit) + "°F"
+        : Math.round(tempEl.dataset.celsius) + "°C";
+    }
+
+    // forecast
+    document.querySelectorAll(".forecast-temp").forEach(el => {
+      el.textContent = useF
+        ? Math.round(el.dataset.fahrenheit) + "°F"
+        : Math.round(el.dataset.celsius) + "°C";
+    });
+  });
+}
+
+// Load mặc định
+fetchWeather("Hanoi")

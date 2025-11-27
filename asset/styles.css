@@ -10,9 +10,7 @@
 /* Cần thêm ID "app-container" vào thẻ <main> trong HTML */
 #app-container {
   /* Đảm bảo phần container chiếm đủ chiều cao để hiển thị background */
-  min-height: calc(
-    100vh - 80px - 50px
-  ); /* Điều chỉnh phù hợp với kích thước header/footer của bạn */
+  min-height: 100vh;
   padding-top: 16px;
   padding-bottom: 24px;
 
@@ -20,12 +18,14 @@
   background-size: cover;
   background-position: center bottom; /* Căn chỉnh cảnh quan từ phía dưới */
   background-repeat: no-repeat;
+  background-attachment: fixed;
 
   /* Hiệu ứng chuyển đổi mượt mà khi đổi class (chuyển đổi hình nền) */
   transition: background-image 1s ease-in-out, background-color 1s ease;
 
   /* Màu nền mặc định nếu không có ảnh (hoặc ảnh chưa load) */
   /* background-color: var(--bg); */
+  flex: 1;
 }
 
 /* Sử dụng bộ chọn thuộc tính CSS: [class*="..."] */
@@ -101,13 +101,25 @@
 html,
 body {
   height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 body {
   margin: 0;
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial,
     sans-serif;
   color: var(--text);
-  background: radial-gradient(120% 80% at 10% -10%, #1a2455, var(--bg));
+  background-image: url("./image/anhtroiamu.jpg");
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-color: var(--bg);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  min-height: 100vh;
 }
 
 .container {
@@ -120,8 +132,8 @@ body {
   border-bottom: 0.1em solid var(--border);
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(0, 0, 0, 0)
+    rgba(11, 16, 32, 0.95),
+    rgba(11, 16, 32, 0.85)
   );
   position: sticky;
   top: 0;
