@@ -212,6 +212,7 @@ body {
   cursor: pointer;
   position: relative;
   overflow: hidden; /* để thumb không bị thừa */
+  text-align: center;
 }
 
 .toggle .thumb {
